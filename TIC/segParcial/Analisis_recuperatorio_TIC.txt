@@ -40,6 +40,9 @@ EJERCICIO 1 — FUENTE Y CODIFICACIÓN
     aproximadamente 1,9193 bits por símbolo, frente a 2 bits del código
     original. Así, la extensión mejora la compresión sin perder
     información.
+    La extensión de orden 3 permite obtener una longitud media por símbolo más cercana a la entropía de la fuente. Esto significa que se aprovecha mejor la distribución de probabilidades y se reduce la redundancia del código.
+    El código original tiene una longitud media de 2 bits por símbolo, mientras que el código de extensión de orden 3 logra aproximadamente 1,9193 bits por símbolo.
+    Por lo tanto, el código de extensión de orden 3 es más eficiente, ya que se aproxima más al límite teórico establecido por la entropía.
 
 EJERCICIO 2 — CANAL DE COMUNICACIÓN
 
