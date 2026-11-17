@@ -1,0 +1,43 @@
+Ejercicio — Clínica: alta de pacientes (2 puntos)
+
+Una clínica registra a sus pacientes desde una ventana. Un paciente se identifica por su DNI y no puede cargarse dos veces. La solución actual es la siguiente:
+
+public class Paciente {
+    private int dni;
+    private String nombre;
+
+    public boolean equals(Paciente otro) {
+        return this.dni == otro.dni;
+    }
+}
+
+public class VentanaPacientes extends JFrame {
+    private JTextField campoDni, campoNombre;
+    private JButton botonAgregar;
+    private ArrayList pacientes = new ArrayList();
+
+    public VentanaPacientes() {
+        // ... creación y ubicación de componentes ...
+        botonAgregar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Paciente p = new Paciente(Integer.parseInt(campoDni.getText()),
+                                          campoNombre.getText());
+                if (!pacientes.contains(p)) {
+                    pacientes.add(p);
+                    JOptionPane.showMessageDialog(null, "Paciente agregado");
+                } else {
+                    JOptionPane.showMessageDialog(null, "El paciente ya existe");
+                }
+            }
+        });
+    }
+}
+a. Identificá los problemas de la solución actual. Distinguí entre los relacionados con la clase Paciente y la colección y los relacionados con la organización de la interfaz.
+
+b. Se cargan dos veces seguidas los datos 30123456 / "Ana". Con el código tal como está, ¿el sistema muestra "Paciente agregado" o "El paciente ya existe" la segunda vez? Justificá qué método equals se ejecuta.
+
+c. Reescribí la clase Paciente para que la igualdad funcione correctamente en cualquier colección. Justificá qué atributos usás en cada método.
+
+d. La clínica necesita que los pacientes no se repitan y poder buscar un paciente rápidamente a partir de su DNI. Elegí la colección más adecuada, escribí su declaración con genéricos y justificá la elección.
+
+e. Rediseñá la solución con el patrón que corresponde a la organización de la interfaz. Hacé un UML reducido con las clases involucradas y sus responsabilidades, e indicá cuál es la fuente, el evento y el oyente del alta de un paciente.
