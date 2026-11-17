@@ -1,0 +1,347 @@
+ANALISIS DEL PARCIAL – TEORIA DE LA INFORMACION
+
+EJERCICIO 1 – FUENTE DE INFORMACION Y COMPRESION Mensaje:
+LJMMJLMJLJJMLMMLLKJL
+
+1.  PROBABILIDADES Y ENTROPIA
+
+Simbolo | Apariciones | Probabilidad J | 6 | 0,30 K | 1 | 0,05 L | 7 |
+0,35 M | 6 | 0,30 Total | 20 | 1
+
+H(A) ≈ 1,7884 bits/simbolo.
+
+Analisis: La entropia representa la incertidumbre promedio de la fuente.
+Hay cuatro simbolos posibles, pero no son equiprobables. L es el mas
+frecuente y K el menos frecuente. La entropia maxima para cuatro
+simbolos seria log2(4) = 2 bits. Como la entropia es menor, existe
+cierta redundancia en la distribucion de la fuente.
+
+2.  CODIGO BINARIO
+
+Una posible distribucion de longitudes obtenida con Huffman o
+Shannon-Fano es:
+
+Simbolo | Probabilidad | Longitud J | 0,30 | 2 K | 0,05 | 2 L | 0,35 | 2
+M | 0,30 | 2
+
+Analisis: Todos los simbolos terminan con codigos de dos bits. Las
+probabilidades son relativamente parecidas y, en este caso, el codigo no
+asigna longitudes diferentes. Para cuatro simbolos, un codigo fijo
+tambien necesita dos bits por simbolo.
+
+3.  TASA DE COMPRESION
+
+El mensaje tiene 20 simbolos y cada uno se codifica con 2 bits: Tamaño
+codificado = 20 × 2 = 40 bits = 5 bytes.
+
+El mensaje ASCII original ocupa 20 bytes. TC = 20 / 5 = 4.
+
+Analisis: El mensaje codificado ocupa cuatro veces menos espacio que el
+original, porque se pasa de 8 bits por caracter ASCII a 2 bits por
+simbolo. No hay relleno adicional porque 40 es multiplo de 8. La
+codificacion no mejora frente a un codigo fijo de dos bits, pero si
+comprime frente al ASCII original.
+
+4.  EXTENSION DE ORDEN 3
+
+La extension agrupa tres simbolos originales como un unico simbolo. Si
+el alfabeto es {J,K,L,M}, hay 4^3 = 64 bloques posibles.
+
+Suponiendo independencia: P(JJL) = P(J) × P(J) × P(L) P(JJL) = 0,3 × 0,3
+× 0,35 = 0,0315.
+
+La entropia de la extension es: H(A^3) = 3 × H(A) ≈ 5,3651 bits/bloque.
+
+Una longitud media de Huffman aproximada es L3 = 5,3835 bits/bloque. Por
+simbolo original: 5,3835 / 3 ≈ 1,7945 bits/simbolo.
+
+Analisis: La entropia se triplica porque ahora se consideran bloques de
+tres simbolos. La extension permite aprovechar mejor las diferencias de
+probabilidad entre secuencias. La longitud media por simbolo baja de 2 a
+aproximadamente 1,7945 bits.
+
+Aclaracion: el mensaje tiene 20 caracteres y no se puede dividir
+exactamente en bloques de tres. Para codificar el mensaje real hay que
+decidir que hacer con los dos simbolos sobrantes. Esto no cambia el
+calculo teorico de la extension.
+
+5.  LONGITUD MEDIA, RENDIMIENTO Y REDUNDANCIA
+
+Orden 1: L = 2 η = H(A)/L = 1,7884/2 = 0,8942 R = 1 - η = 0,1058
+
+Orden 3: L3 = 5,3835 bits/bloque η3 = 5,3651/5,3835 ≈ 0,9966 R3 = 1 -
+0,9966 = 0,0034
+
+Comparacion: Parametro | Orden 1 | Orden 3 Entropia | 1,7884 | 5,3651
+Longitud media | 2 | 5,3835 Longitud por simbolo | 2 | 1,7945
+Rendimiento | 89,42% | 99,66% Redundancia | 10,58% | 0,34%
+
+Analisis: La extension de orden 3 mejora el rendimiento y reduce la
+redundancia. Su longitud media por simbolo queda mas cerca de la
+entropia. Esto muestra que agrupar simbolos permite aprovechar mejor las
+probabilidades de las secuencias.
+
+6.  PRIMER TEOREMA DE SHANNON
+
+Para un codigo prefijo: H(A) ≤ L < H(A) + 1
+
+Orden 1: 1,7884 ≤ 2 < 2,7884. Se cumple.
+
+Orden 3: 5,3651 ≤ 5,3835 < 6,3651. Se cumple.
+
+Analisis: Ambos codigos cumplen porque sus longitudes medias estan entre
+la entropia y la entropia mas un bit. El codigo de orden 3 esta mucho
+mas cerca de la entropia, por lo que es mas eficiente.
+
+============================================================
+
+EJERCICIO 2 – ANALISIS DE UN CANAL
+
+Entrada: 10000111100110111010101010110100 Salida:
+CBBBBBBCDBBDCABDBBAADBBACAAABBBA
+
+1.  PROBABILIDADES A PRIORI Y MATRIZ DEL CANAL
+
+Simbolo | Apariciones | Probabilidad 0 | 15 | 0,46875 1 | 17 | 0,53125
+
+P(A) = [0,46875; 0,53125].
+
+Matriz del canal (columnas A, B, C y D):
+
+             A       B       C       D
+
+Entrada 0 0,3333 0,6667 0 0 Entrada 1 0,1765 0,3529 0,2353 0,2353
+
+Analisis: Si se envia 0, puede recibirse A o B. Si se envia 1, pueden
+recibirse A, B, C o D. Una misma entrada puede generar distintas
+salidas, por lo que el canal introduce incertidumbre. Cada fila suma 1
+porque representa todas las salidas posibles para una entrada.
+
+2.  CANAL SIN RUIDO Y/O DETERMINANTE
+
+Determinante: se analiza por filas. Cada entrada debe tener una unica
+salida posible. La primera fila tiene dos valores no nulos y la segunda
+tiene cuatro; por lo tanto, no es determinante.
+
+Sin ruido: se analiza por columnas. Cada salida debe poder provenir de
+una unica entrada. A y B pueden provenir tanto de 0 como de 1; por lo
+tanto, no es sin ruido.
+
+Resultado: NINGUNO.
+
+Conclusion: El canal no es determinante porque una entrada puede
+producir distintas salidas. Tampoco es sin ruido porque algunas salidas
+pueden provenir de entradas diferentes.
+
+3.  RUIDO, EQUIVOCACION, PERDIDA E INFORMACION MUTUA
+
+Resultados aproximados: H(A) = 0,9972 H(B) = 1,7500 H(B|A), ruido =
+1,4686 H(A|B), equivocacion = 0,7158 I(A;B) = 0,2814
+
+Ruido: Mide la incertidumbre sobre la salida cuando conocemos la
+entrada. Como es mayor que cero, el canal introduce ruido. Aunque
+sepamos que se envio un 1, todavia hay cuatro salidas posibles.
+
+Equivocacion: Mide la incertidumbre que queda sobre la entrada despues
+de conocer la salida. Como es mayor que cero, recibir un simbolo no
+permite conocer perfectamente que se envio. Por ejemplo, A puede
+provenir tanto de 0 como de 1.
+
+Perdida: En este contexto coincide con la equivocacion: Perdida = H(A) -
+I(A;B) = 0,9972 - 0,2814 = 0,7158.
+
+Informacion mutua: Mide cuanta informacion sobre la entrada obtenemos al
+observar la salida: I(A;B) = H(A) - H(A|B) = 0,2814.
+
+Analisis general: La salida aporta informacion sobre la entrada porque
+la informacion mutua es positiva. Sin embargo, esa informacion es
+incompleta porque la equivocacion sigue siendo mayor que cero.
+
+Relacion fundamental: H(A) = I(A;B) + H(A|B).
+
+4.  REDUCCIONES SUFICIENTES DEL CANAL
+
+Las columnas A y B son proporcionales: A = [0,3333; 0,1765] B = [0,6667;
+0,3529] B es aproximadamente el doble de A.
+
+Las columnas C y D son iguales: C = [0; 0,2353] D = [0; 0,2353].
+
+Por lo tanto, se pueden unir A con B y C con D.
+
+Matriz reducida:
+
+             Salida 1   Salida 2
+
+Entrada 0 1 0 Entrada 1 0,5294 0,4706
+
+Analisis: Las columnas proporcionales representan salidas que tienen la
+misma distribucion relativa respecto de las entradas. Distinguir entre
+ellas no aporta informacion adicional sobre la entrada. Por eso pueden
+agruparse sin perder informacion mutua ni capacidad.
+
+La reduccion no elimina el ruido: simplifica la representacion del
+canal.
+
+La capacidad se conserva cuando la reduccion agrupa correctamente
+columnas proporcionales.
+
+5.  CAPACIDAD Y PROBABILIDAD DE ERROR
+
+Capacidad: La capacidad es la maxima informacion mutua que se puede
+obtener eligiendo adecuadamente las probabilidades de entrada: C =
+maximo de I(A;B) para las distribuciones P(A).
+
+La funcion capacidad_binaria prueba distribuciones [p, 1-p]. Para cada
+una calcula las probabilidades de salida, la entropia de salida, el
+ruido y la informacion mutua. Guarda el mayor resultado y la
+distribucion que lo produce.
+
+Para la matriz reducida: C ≈ 0,2988 P(A) optima ≈ [0,6025; 0,3975].
+
+Analisis: La capacidad es mayor que la informacion mutua calculada con
+las probabilidades reales: 0,2988 > 0,2814. Esto ocurre porque la
+informacion mutua usa la distribucion real de entrada, mientras que la
+capacidad busca la distribucion que maximiza la informacion transmitida.
+
+Probabilidad de error: La funcion aplica la regla de maxima posibilidad.
+Para cada simbolo recibido, elige la entrada con mayor probabilidad
+conjunta.
+
+Pe = 0,28125.
+
+Analisis: Existe un 28,125% de probabilidad de equivocarse al intentar
+determinar que simbolo se envio originalmente usando esa regla. Algunas
+salidas pueden provenir de distintas entradas. La probabilidad de error
+depende de las probabilidades a priori.
+
+6.  DETECCION Y CORRECCION DE ERRORES
+
+Los 32 bits se organizan en una matriz de 4 filas y 8 columnas:
+
+10000111 10011011 10101010 10110100
+
+Deteccion: La funcion verificarMatriz comprueba que la cantidad de unos
+sea par en cada fila y columna.
+
+Resultado: Fila con error: indice 1. Columna con error: indice 6.
+
+Analisis: Si hay exactamente una fila y una columna con paridad
+incorrecta, y suponemos un unico error de bit, el bit alterado se
+encuentra en su interseccion. Los indices empiezan en cero: fila 1 es la
+segunda y columna 6 es la septima.
+
+Correccion: La funcion decodificarMensaje invierte el bit de esa
+posicion. La matriz corregida queda:
+
+10000111 10011001 10101010 10110100
+
+Luego toma los primeros siete bits de cada fila, excepto la primera fila
+de paridad, convierte cada grupo de binario a decimal y despues a ASCII.
+
+Mensaje decodificado: LUZ.
+
+Analisis: El sistema detecto un error de un bit mediante la paridad de
+filas y columnas. La interseccion permitio localizarlo y corregirlo
+invirtiendo su valor. Luego se reconstruyo el mensaje ASCII.
+
+Este metodo funciona para un unico error de bit. Con varios errores
+puede detectar inconsistencias, pero no necesariamente localizar y
+corregirlos correctamente.
+
+============================================================
+
+RESUMEN PARA ESTUDIAR
+
+EJERCICIO 1: - Entropia: incertidumbre promedio de la fuente. Cuanto mas
+equiprobables son los simbolos, mayor es. - Huffman: combina los
+simbolos menos probables para minimizar la longitud media de un codigo
+prefijo. - Extension: agrupa simbolos y aprovecha mejor las
+probabilidades de las secuencias. - Rendimiento: mide que tan cerca esta
+la longitud media de la entropia. - Redundancia: representa la
+proporcion de longitud media que excede la entropia. - Shannon:
+establece limites teoricos para la longitud media de un codigo prefijo.
+
+EJERCICIO 2: - Determinante: cada entrada tiene una unica salida
+posible. - Sin ruido: cada salida permite identificar una unica
+entrada. - Ruido: incertidumbre sobre la salida conociendo la entrada. -
+Equivocacion: incertidumbre sobre la entrada conociendo la salida. -
+Informacion mutua: informacion compartida entre entrada y salida. -
+Reduccion: agrupa salidas proporcionales sin perder capacidad. -
+Capacidad: maxima informacion mutua para una distribucion de entrada
+optima. - Probabilidad de error: probabilidad de elegir incorrectamente
+la entrada mas probable. - Paridad: permite detectar y, bajo ciertas
+condiciones, corregir errores en bits.
+
+PREGUNTAS POSIBLES
+
+1.  ¿Por que la extension de orden 3 puede mejorar el rendimiento?
+    Porque al agrupar simbolos se aprovechan mejor las probabilidades de
+    las secuencias y la longitud media por simbolo puede acercarse a la
+    entropia.
+
+2.  ¿Huffman siempre genera un codigo optimo? Si, para codigos prefijo
+    binarios y las probabilidades dadas, Huffman minimiza la longitud
+    media.
+
+3.  ¿Un canal determinante necesariamente es sin ruido? No. Puede tener
+    una unica salida por entrada, pero diferentes entradas pueden
+    producir la misma salida.
+
+4.  ¿Que significa que la equivocacion sea cero? Que conociendo la
+    salida podemos determinar perfectamente la entrada original.
+
+5.  ¿La capacidad depende de las probabilidades a priori? La informacion
+    mutua depende de ellas. La capacidad es el maximo que se obtiene
+    eligiendo la distribucion optima.
+
+6.  ¿Siempre se conserva la capacidad al reducir un canal? No con
+    cualquier reduccion. Se conserva al agrupar correctamente columnas
+    proporcionales, porque no se pierde informacion relevante sobre la
+    entrada.
+
+7.  ¿Que pasa si la probabilidad de error es cero? La regla de maxima
+    posibilidad permite identificar correctamente la entrada en todas
+    las salidas posibles.
+
+8.  ¿Que significa encontrar una fila y una columna con paridad
+    incorrecta? Bajo la hipotesis de un unico error de bit, su
+    interseccion identifica la posicion del bit que debe invertirse.
+
+OBSERVACIONES SOBRE EL CODIGO
+
+1.  verificarMatriz esta definida dos veces. La segunda definicion
+    reemplaza a la primera; se puede eliminar una.
+
+2.  reducirCanal utiliza canalCompuesto, pero esa funcion no aparece en
+    el codigo compartido. Es necesaria para ejecutar la reduccion.
+
+3.  shanonN no utiliza el parametro n. Ademas, el teorema se expresa
+    como H(A) <= L < H(A)+1.
+
+4.  equivocacion construye la distribucion conjunta como una lista
+    plana. Es valida para calcular la entropia, aunque conjunta devuelve
+    una matriz bidimensional.
+
+5.  capacidad_binaria supone que el canal tiene exactamente dos
+    entradas.
+
+6.  decodificarMensaje modifica la matriz original cuando corrige un
+    bit. Tambien supone que cada fila tiene siete bits de informacion y
+    que la primera fila es de paridad.
+
+7.  extenderNrecur supone independencia entre los simbolos de la fuente.
+    Si existe dependencia entre simbolos consecutivos, multiplicar las
+    probabilidades no seria correcto.
+
+CONSEJO FINAL
+
+No estudies solamente como se ejecuta cada funcion. Estudia
+especialmente que significa el numero que devuelve. Saber que una
+funcion calcula H(A|B) es importante, pero poder explicar que significa
+que de 0,71 bits demuestra que entendiste teoria de la informacion.
+
+Relacion fundamental: I(A;B) = H(A) - H(A|B) = H(B) - H(B|A)
+
+-   Ruido: incertidumbre sobre la salida conociendo la entrada.
+-   Equivocacion: incertidumbre sobre la entrada conociendo la salida.
+-   Informacion mutua: informacion que comparten la entrada y la salida.

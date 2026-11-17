@@ -1,0 +1,562 @@
+1. Extensión de alfabetos y probabilidades
+extenderNrecur(ListaC, ListaP, n)
+Objetivo: generar todas las palabras de longitud n posibles a partir de un alfabeto, calculando también sus probabilidades.
+
+Funcionamiento paso a paso:
+1. Primero crea dos listas vacías: NuevoAlfabeto y NuevoP, donde va a guardar las nuevas palabras y sus probabilidades.
+2. Comprueba si n == 1. Si es así, devuelve directamente el alfabeto y las probabilidades originales, porque las palabras ya tienen longitud uno.
+3. Si n es mayor que uno, se llama recursivamente a sí misma con n-1. Esto permite obtener primero todas las combinaciones de longitud anterior.
+4. Después, recorre todas las palabras generadas anteriormente.
+5. Para cada palabra, recorre todos los símbolos del alfabeto original y concatena cada uno al final de la palabra.
+6. Al mismo tiempo, multiplica la probabilidad de la palabra anterior por la probabilidad del nuevo símbolo.
+7. Finalmente, devuelve las nuevas palabras y sus probabilidades.
+Concepto importante: se basa en que, si los símbolos son independientes, la probabilidad de una secuencia es el producto de las probabilidades individuales.
+
+Por ejemplo, si tenemos:
+- Alfabeto: [A, B]
+- Probabilidades: [0.6, 0.4]
+Para n = 2 obtenemos:
+Palabra	Probabilidad
+AA	0.36
+AB	0.24
+BA	0.24
+BB	0.16
+
+
+prob_priori(entrada)
+Objetivo: calcular las probabilidades a priori de los símbolos de una fuente a partir de un mensaje de entrada.
+
+Funcionamiento paso a paso:
+1. Recibe una cadena que representa el mensaje.
+2. Utiliza set(entrada) para obtener los símbolos diferentes, sin repeticiones.
+3. Utiliza sorted() para ordenar alfabéticamente los símbolos.
+4. Calcula la cantidad total de símbolos del mensaje con len(entrada).
+5. Recorre cada símbolo del alfabeto.
+6. Cuenta cuántas veces aparece cada símbolo utilizando entrada.count(simbolo).
+7. Divide esa cantidad por el total de símbolos para obtener su probabilidad.
+8. Finalmente, devuelve dos listas: el alfabeto y sus probabilidades.
+Concepto importante: calcula la probabilidad de que aparezca cada símbolo antes de ingresar al canal, es decir, \(P(A)\).
+
+Por ejemplo, para "AABBC":
+- A aparece 2 veces: 2/5 = 0.4.
+- B aparece 2 veces: 2/5 = 0.4.
+- C aparece 1 vez: 1/5 = 0.2.
+Devuelve:
+
+(['A', 'B', 'C'], [0.4, 0.4, 0.2])
+
+2. Probabilidades del canal
+probabilidades_salida(P, M)
+Objetivo: calcular las probabilidades a posteriori de la salida del canal, es decir, \(P(B)\).
+
+Funcionamiento paso a paso:
+1. Recibe las probabilidades a priori de entrada P y la matriz del canal M.
+2. Crea una lista vacía llamada salida.
+3. Recorre las columnas de la matriz, porque cada columna representa un posible símbolo de salida.
+4. Para cada columna inicializa una variable prob en cero.
+5. Recorre todas las filas de esa columna.
+6. Multiplica la probabilidad de cada símbolo de entrada por la probabilidad condicional de obtener esa salida.
+7. Suma todos esos productos.
+8. Agrega el resultado a la lista de salida.
+9. Finalmente, devuelve las probabilidades de todos los símbolos de salida.
+Concepto importante: aplica la ley de probabilidad total:
+\[
+P(B_j)=\sum_i P(A_i)\cdot P(B_j|A_i)
+\]
+
+Es decir, para conocer la probabilidad de recibir un símbolo, tenemos que considerar todas las posibles entradas que podrían haberlo producido.
+
+probabilidades_posteriori(P, M)
+Objetivo: calcular las probabilidades a posteriori, es decir, la probabilidad de que se haya enviado cada símbolo original sabiendo qué símbolo recibimos.
+
+Funcionamiento paso a paso:
+1. Recibe las probabilidades a priori y la matriz del canal.
+2. Primero llama a probabilidades_salida(P,M) para calcular las probabilidades de cada símbolo de salida.
+3. Crea una matriz vacía llamada posteriori.
+4. Recorre cada fila de la matriz original, que representa un símbolo de entrada.
+5. Para cada fila recorre todas las probabilidades de salida.
+6. Si la probabilidad de esa salida es distinta de cero, aplica el teorema de Bayes.
+7. Multiplica la probabilidad a priori de la entrada por la probabilidad condicional del canal y divide por la probabilidad de la salida.
+8. Si la probabilidad de salida es cero, agrega un cero, porque no se puede condicionar sobre un evento imposible.
+9. Finalmente, devuelve la matriz de probabilidades a posteriori.
+La fórmula utilizada es:
+\[
+P(A_i|B_j)=\frac{P(A_i)\cdot P(B_j|A_i)}{P(B_j)}
+\]
+
+Concepto importante: mientras que la matriz original nos dice qué puede recibir el receptor sabiendo qué se envió, la matriz a posteriori nos dice qué se pudo haber enviado sabiendo qué recibimos.
+
+matriz_canal(entrada, salida)
+Objetivo: construir la matriz del canal a partir de un mensaje original y el mensaje que salió después de atravesarlo.
+
+Funcionamiento paso a paso:
+1. Recibe dos cadenas: el mensaje original y el mensaje recibido.
+2. Obtiene los símbolos diferentes de entrada y los ordena.
+3. Obtiene los símbolos diferentes de salida y los ordena.
+4. Crea una matriz vacía.
+5. Recorre cada símbolo posible de entrada. Cada uno representa una fila.
+6. Para cada símbolo de entrada, recorre todos los símbolos de salida. Cada uno representa una columna.
+7. Cuenta cuántas veces aparece el símbolo de entrada en el mensaje original.
+8. Cuenta cuántas veces ese símbolo de entrada coincide con el símbolo de salida correspondiente en la misma posición.
+9. Divide la cantidad de coincidencias por la cantidad total de apariciones de ese símbolo de entrada.
+10. Agrega ese resultado a la fila.
+11. Cuando termina de recorrer las salidas, agrega la fila completa a la matriz.
+12. Finalmente, devuelve la matriz del canal.
+Concepto importante: está calculando probabilidades condicionales:
+\[
+M[i][j]=P(B_j|A_i)
+\]
+
+Cada fila representa una entrada y cada columna una salida.
+
+Por eso, cada fila debería sumar 1, siempre que se hayan observado todas las salidas correspondientes.
+
+3. Entropía y compresión
+entropia(P)
+Objetivo: calcular la entropía de una fuente, es decir, la incertidumbre promedio que existe antes de conocer qué símbolo se va a transmitir.
+
+Funcionamiento paso a paso:
+1. Recibe una lista de probabilidades.
+2. Inicializa una variable H en cero.
+3. Recorre todas las probabilidades.
+4. Si la probabilidad es mayor que cero, calcula su logaritmo en base 2.
+5. Multiplica la probabilidad por su logaritmo y resta el resultado a H.
+6. Al terminar, devuelve la entropía total.
+La fórmula es:
+\[
+H(A)=-\sum_i P(A_i)\log_2(P(A_i))
+\]
+
+Concepto importante:
+- Si todos los símbolos son equiprobables, la entropía es máxima.
+- Si un símbolo tiene probabilidad 1, la entropía es cero, porque no existe incertidumbre.
+- Nunca puede ser negativa.
+La unidad de medida es el bit por símbolo.
+
+tasaCompresion(mensaje, codificacion)
+Objetivo: calcular cuánto se redujo el tamaño de un mensaje después de codificarlo.
+
+Funcionamiento paso a paso:
+1. Recibe el mensaje original y su codificación.
+2. Calcula el tamaño original utilizando encode("utf-8"). Esto es importante porque mide bytes y no caracteres.
+3. Calcula el tamaño de la codificación con len(codificacion).
+4. Si el tamaño de la codificación es cero, devuelve cero para evitar una división por cero.
+5. Si no, divide el tamaño original por el tamaño comprimido.
+6. Devuelve el resultado.
+La fórmula es:
+\[
+TC=\frac{Tamaño\ original}{Tamaño\ comprimido}
+\]
+
+Interpretación:
+- Mayor que 1: hubo compresión.
+- Igual a 1: el tamaño no cambió.
+- Menor que 1: el archivo terminó ocupando más espacio.
+Por ejemplo, si originalmente teníamos 100 bytes y después de codificar tenemos 40 bytes:
+\[
+TC=\frac{100}{40}=2.5
+\]
+
+Significa que el mensaje se comprimió 2.5 veces.
+
+huffman(probabilidades)
+Objetivo: generar un código de Huffman, asignando códigos binarios cortos a los símbolos más probables y códigos más largos a los menos probables.
+
+Funcionamiento paso a paso:
+1. Recibe una lista de probabilidades.
+2. Crea una lista de nodos, donde cada nodo contiene la probabilidad de un símbolo y su posición original.
+3. Mientras haya más de un nodo:
+   - Ordena los nodos de menor a mayor probabilidad.
+   - Extrae los dos nodos con menor probabilidad.
+   - Suma sus probabilidades.
+   - Crea un nuevo nodo que contiene esa suma y los dos nodos anteriores como hijos.
+   - Agrega el nuevo nodo a la lista.
+4. Cuando queda un único nodo, significa que se construyó el árbol completo de Huffman.
+5. Crea una lista de códigos vacíos, respetando las posiciones originales de los símbolos.
+6. Define una función recursiva llamada recorrer.
+7. Esta función recorre el árbol:
+   - Si encuentra una hoja, significa que llegó a un símbolo y guarda el código binario correspondiente.
+   - Si va hacia el hijo izquierdo, agrega un 0.
+   - Si va hacia el hijo derecho, agrega un 1.
+8. Finalmente, devuelve la lista de códigos.
+Concepto importante: Huffman construye un código prefijo óptimo para las probabilidades dadas. Esto significa que ningún código es prefijo de otro y que la longitud media del código es mínima entre los códigos prefijo binarios.
+
+shannonFano(probabilidades)
+Objetivo: generar un código binario utilizando el método de Shannon-Fano.
+
+Funcionamiento paso a paso:
+1. Recibe una lista de probabilidades.
+2. Crea una lista de elementos que contiene cada probabilidad y su posición original.
+3. Ordena los elementos de mayor a menor probabilidad.
+4. Crea una lista de códigos vacíos.
+5. Define una función recursiva llamada codificar.
+6. Si el grupo tiene un solo elemento, significa que ya se llegó a un símbolo y se le asigna el código acumulado.
+7. Si tiene más de un elemento:
+   - Busca el punto de corte que permita dividir el grupo en dos partes con sumas de probabilidades lo más parecidas posible.
+   - Para eso, prueba todos los cortes posibles.
+   - Calcula la suma de probabilidades de la izquierda y de la derecha.
+   - Calcula la diferencia absoluta entre ambas sumas.
+   - Guarda el corte que tenga la menor diferencia.
+8. Divide el grupo en dos partes.
+9. A la parte izquierda le agrega un 0 al código.
+10. A la parte derecha le agrega un 1.
+11. Llama recursivamente a la función para seguir dividiendo los grupos.
+12. Finalmente, devuelve los códigos generados.
+Concepto importante: al igual que Huffman, intenta asignar códigos más cortos a los símbolos más probables. Sin embargo, a diferencia de Huffman, Shannon-Fano no garantiza que la longitud media sea óptima.
+
+codificarMensaje(alf, cod, mensaje)
+Objetivo: transformar un mensaje de texto en una secuencia de bytes utilizando un alfabeto y su correspondiente alfabeto código.
+
+Funcionamiento paso a paso:
+1. Recibe el alfabeto original, los códigos binarios correspondientes y el mensaje que quiere codificar.
+2. Utiliza zip() para relacionar cada símbolo con su código.
+3. Convierte esas relaciones en un diccionario, donde cada símbolo es una clave y su código binario es el valor.
+4. Recorre el mensaje y reemplaza cada símbolo por su código binario.
+5. Une todos los códigos en una única cadena de bits.
+6. Comprueba si la cantidad de bits es múltiplo de 8.
+7. Si no lo es, agrega ceros al final hasta completar el último byte.
+8. Crea un bytearray vacío.
+9. Recorre la cadena de bits de ocho en ocho.
+10. Convierte cada grupo de ocho bits de binario a decimal utilizando int(...,2).
+11. Agrega cada valor al bytearray.
+12. Finalmente, devuelve el mensaje codificado en bytes.
+Concepto importante: las computadoras almacenan la información en bytes, por eso agrupamos los bits de ocho en ocho.
+
+Longitud(Prob, cod)
+Objetivo: calcular la longitud media del código, es decir, cuántos bits se utilizan en promedio para representar cada símbolo.
+
+Funcionamiento paso a paso:
+1. Recibe las probabilidades de los símbolos y sus códigos correspondientes.
+2. Inicializa una variable sum en cero.
+3. Recorre todas las probabilidades.
+4. Multiplica la probabilidad de cada símbolo por la longitud de su código.
+5. Acumula todos los resultados.
+6. Finalmente, devuelve la suma.
+La fórmula es:
+\[
+L=\sum_i P(A_i)\cdot l_i
+\]
+
+Donde \(l_i\) representa la cantidad de bits del código del símbolo.
+
+Concepto importante: no calcula la longitud de un mensaje específico, sino la cantidad promedio de bits que se utilizan por símbolo.
+
+rendimientoRedundancia(C, P)
+Objetivo: calcular el rendimiento y la redundancia de un código.
+
+Funcionamiento paso a paso:
+1. Recibe los códigos asignados a los símbolos y sus probabilidades.
+2. Calcula la entropía de la fuente utilizando entropia(P).
+3. Calcula la longitud media del código utilizando Longitud(P,C).
+4. Divide la entropía por la longitud media para obtener el rendimiento.
+5. Calcula la redundancia restando el rendimiento a 1.
+6. Devuelve ambos valores.
+Las fórmulas son:
+\[
+\eta=\frac{H(A)}{L}
+\]
+
+\[
+R=1-\eta
+\]
+
+Concepto importante:
+- Un rendimiento cercano a 1 significa que el código aprovecha muy bien los bits utilizados.
+- Una redundancia cercana a 0 significa que se utilizan pocos bits adicionales respecto del mínimo teórico.
+
+shanonN(S, P, n)
+Objetivo: comprobar el teorema de codificación de fuente de Shannon.
+
+Funcionamiento paso a paso:
+1. Recibe un código S, las probabilidades P y un parámetro n.
+2. Calcula la entropía de la fuente.
+3. Calcula la longitud media del código.
+4. Imprime la desigualdad que relaciona ambos valores.
+El teorema establece:
+\[
+H(A)\leq L < H(A)+1
+\]
+
+Esto significa que la longitud media de un código prefijo óptimo no puede ser menor que la entropía y que existe un código cuya longitud media es menor que la entropía más un bit.
+
+Ojo: tu función recibe n, pero no lo utiliza. Además, imprime la desigualdad sin comprobar que realmente se cumpla. Para verificarla, tendrías que comparar los valores calculados.
+
+4. Análisis de canales
+analizar_canal(M)
+Objetivo: determinar si un canal es determinante, sin ruido, ambos o ninguno.
+
+Funcionamiento paso a paso:
+1. Recibe la matriz del canal.
+2. Inicializa dos variables booleanas en True:
+   - determinante: supone inicialmente que el canal es determinante.
+   - sin_ruido: supone inicialmente que el canal no tiene ruido.
+3. Primero analiza las filas:
+   - Recorre cada fila.
+   - Cuenta cuántos elementos son mayores que cero.
+   - Si encuentra más de uno, significa que una misma entrada puede generar diferentes salidas.
+   - Por lo tanto, el canal no es determinante y cambia la variable a False.
+4. Después analiza las columnas:
+   - Recorre cada columna.
+   - Cuenta cuántos elementos son mayores que cero.
+   - Si encuentra más de uno, significa que una misma salida puede provenir de diferentes entradas.
+   - Por lo tanto, el canal tiene ruido y cambia sin_ruido a False.
+5. Finalmente, evalúa las dos variables:
+   - Si ambas son verdaderas, imprime "Ambos".
+   - Si solamente determinante es verdadera, imprime "Determinante".
+   - Si solamente sin_ruido es verdadera, imprime "Sin ruido".
+   - Si ninguna es verdadera, imprime "Ninguno".
+Conceptos importantes:
+- Determinante: conociendo la entrada, conocemos exactamente la salida. \(H(B|A)=0\).
+- Sin ruido: conociendo la salida, conocemos exactamente la entrada. \(H(A|B)=0\).
+- Ambos: existe una correspondencia unívoca entre entradas y salidas.
+
+equivocacion(M, P)
+Objetivo: calcular la equivocación del canal, es decir, cuánta incertidumbre queda sobre el mensaje original después de recibir el mensaje de salida.
+
+Funcionamiento paso a paso:
+1. Recibe la matriz del canal y las probabilidades a priori.
+2. Crea una lista vacía llamada conjunta.
+3. Recorre todas las filas y columnas de la matriz.
+4. Multiplica la probabilidad a priori de cada entrada por la probabilidad condicional del canal.
+5. Agrega esos resultados a la lista conjunta.
+6. Después calcula las probabilidades de salida utilizando probabilidades_salida(P,M).
+7. Calcula la entropía de la distribución conjunta.
+8. Calcula la entropía de la salida.
+9. Resta ambas entropías y devuelve el resultado.
+La fórmula que utiliza es:
+\[
+H(A|B)=H(A,B)-H(B)
+\]
+
+Concepto importante:
+- Si da cero, significa que al recibir la salida podemos conocer perfectamente qué se envió.
+- Si da un valor mayor que cero, todavía existe incertidumbre sobre la entrada.
+- Si es igual a \(H(A)\), significa que la salida no nos aporta información sobre la entrada.
+
+informacion_mutua(M, P)
+Objetivo: calcular cuánta información obtenemos sobre la entrada al observar la salida.
+
+Funcionamiento paso a paso:
+1. Recibe la matriz del canal y las probabilidades a priori.
+2. Calcula la entropía de entrada utilizando entropia(P).
+3. Calcula la equivocación utilizando equivocacion(M,P).
+4. Resta la equivocación a la entropía de entrada.
+5. Devuelve el resultado.
+La fórmula es:
+\[
+I(A;B)=H(A)-H(A|B)
+\]
+
+Concepto importante:
+- Si da cero, la salida no aporta información sobre la entrada.
+- Si da un valor mayor que cero, la salida permite conocer parcialmente la entrada.
+- Si es igual a \(H(A)\), podemos conocer perfectamente la entrada a partir de la salida.
+
+conjunta(P, M)
+Objetivo: construir la matriz de probabilidades conjuntas de entrada y salida.
+
+Funcionamiento paso a paso:
+1. Recibe las probabilidades a priori y la matriz del canal.
+2. Crea una matriz vacía llamada J.
+3. Recorre cada símbolo de entrada.
+4. Para cada entrada recorre todas las posibles salidas.
+5. Multiplica la probabilidad a priori de la entrada por la probabilidad condicional de obtener esa salida.
+6. Agrega cada resultado a una fila.
+7. Cuando termina una fila, la agrega a la matriz conjunta.
+8. Finalmente, devuelve la matriz completa.
+La fórmula es:
+\[
+P(A_i,B_j)=P(A_i)\cdot P(B_j|A_i)
+\]
+
+Concepto importante: esta matriz representa la probabilidad de que ocurra simultáneamente una entrada determinada y una salida determinada.
+
+ruido(P, M)
+Objetivo: calcular el ruido del canal, es decir, la incertidumbre que aparece en la salida cuando conocemos qué símbolo ingresó.
+
+Funcionamiento paso a paso:
+1. Recibe las probabilidades a priori y la matriz del canal.
+2. Inicializa una variable h en cero.
+3. Llama a conjunta(P,M) para obtener la matriz de probabilidades conjuntas.
+4. Recorre todas las filas y columnas de la matriz.
+5. Comprueba que la probabilidad conjunta sea mayor que cero para evitar calcular logaritmos de cero.
+6. Multiplica la probabilidad conjunta por el logaritmo en base 2 de la probabilidad condicional del canal.
+7. Va acumulando el resultado negativo en h.
+8. Finalmente, devuelve el ruido total.
+La fórmula es:
+\[
+H(B|A)=-\sum_i\sum_j P(A_i,B_j)\log_2 P(B_j|A_i)
+\]
+
+Concepto importante:
+- Ruido cero: cada entrada produce una única salida.
+- Ruido mayor que cero: una entrada puede producir diferentes salidas.
+- Si el ruido es igual a \(H(B)\), la entrada no aporta información sobre la salida.
+
+5. Reducción de canales
+columnasProporcionales(matriz, c1, c2)
+Objetivo: comprobar si dos columnas de una matriz son proporcionales.
+
+Funcionamiento paso a paso:
+1. Recibe una matriz y los índices de dos columnas que quiere comparar.
+2. Inicializa razon en None.
+3. Recorre todas las filas de la matriz.
+4. Obtiene los valores de las dos columnas en la fila actual.
+5. Si el valor de la segunda columna es prácticamente cero:
+   - Comprueba que el valor de la primera también sea prácticamente cero.
+   - Si no lo es, devuelve False, porque no pueden ser proporcionales.
+6. Si el valor de la segunda columna no es cero:
+   - Calcula la división entre ambos valores.
+   - Si es la primera comparación, guarda esa relación.
+   - Si ya había una relación guardada, comprueba que sea igual a la anterior.
+7. Si alguna relación es diferente, devuelve False.
+8. Si termina de recorrer todas las filas sin encontrar diferencias, devuelve True.
+Concepto importante: dos columnas proporcionales representan salidas que contienen la misma información sobre la entrada. Por eso pueden agruparse en una única salida durante la reducción del canal.
+
+Se utiliza 1e-9 como tolerancia para evitar problemas de precisión con números decimales.
+
+matrizReduccion(matriz, c1, c2)
+Objetivo: construir una matriz de transformación que permita unir dos columnas en una sola.
+
+Funcionamiento paso a paso:
+1. Recibe una matriz y los índices de las dos columnas que se quieren unir.
+2. Obtiene la cantidad de columnas originales.
+3. Si c1 es mayor que c2, intercambia sus posiciones para asegurarse de que c1 sea el menor índice.
+4. Crea una matriz vacía llamada R.
+5. Recorre todas las columnas originales.
+6. Para cada columna crea una fila con una cantidad de posiciones igual a la cantidad de columnas originales menos uno.
+7. Si está recorriendo la segunda columna que se quiere unir, coloca un 1 en la posición de la primera columna.
+8. Si está recorriendo una columna posterior a la segunda, desplaza su posición una unidad hacia la izquierda.
+9. Si está recorriendo una columna anterior a la segunda, mantiene su posición.
+10. Agrega cada fila a la matriz de reducción.
+11. Finalmente, devuelve la matriz de transformación.
+Concepto importante: construye una matriz que indica cómo se agrupan las salidas originales para formar un alfabeto de salida más pequeño.
+
+reducirCanal(matriz)
+Objetivo: reducir un canal buscando y uniendo todas las columnas proporcionales que encuentre.
+
+Funcionamiento paso a paso:
+1. Recibe la matriz original.
+2. Crea una copia de la matriz para no modificar la original.
+3. Entra en un ciclo que se repite hasta que no encuentre más columnas proporcionales.
+4. Inicializa encontrada en False.
+5. Calcula la cantidad de columnas de la matriz actual.
+6. Recorre todas las combinaciones posibles de dos columnas.
+7. Para cada combinación llama a columnasProporcionales.
+8. Si encuentra dos columnas proporcionales:
+   - Llama a matrizReduccion para construir la matriz de transformación.
+   - Llama a canalCompuesto para combinar las dos columnas.
+   - Guarda el resultado como la nueva matriz reducida.
+   - Cambia encontrada a True.
+   - Sale de los ciclos para volver a empezar con la nueva matriz.
+9. Si termina de buscar y no encuentra ninguna columna proporcional, sale del ciclo.
+10. Finalmente, devuelve la matriz reducida.
+Concepto importante: no se limita a una única reducción. Continúa buscando nuevas columnas proporcionales hasta que ya no sea posible reducir más el canal mediante este procedimiento.
+
+Ojo: en tu código no aparece definida canalCompuesto. Esta función es necesaria para que reducirCanal pueda ejecutarse.
+
+6. Probabilidad de error y capacidad
+probabilidadError(apriori, matriz)
+Objetivo: calcular la probabilidad de error utilizando la regla de decisión de máxima posibilidad.
+
+Funcionamiento paso a paso:
+1. Recibe las probabilidades a priori de entrada y la matriz del canal.
+2. Inicializa la variable error en cero.
+3. Recorre cada columna de la matriz, porque cada columna representa una posible salida.
+4. Para cada salida crea una lista de probabilidades.
+5. Recorre todas las entradas posibles.
+6. Multiplica la probabilidad a priori de cada entrada por la probabilidad condicional de obtener esa salida.
+7. Guarda cada resultado en la lista.
+8. Suma todas las probabilidades de esa columna.
+9. Busca la mayor probabilidad de la lista utilizando max().
+10. Resta la mayor probabilidad a la suma total de la columna.
+11. Acumula ese resultado en error.
+12. Finalmente, devuelve la probabilidad de error total.
+La fórmula es:
+\[
+P_e=\sum_j\left[P(B_j)-\max_i P(A_i,B_j)\right]
+\]
+
+Concepto importante: para cada salida, el receptor elige la entrada que tenga mayor probabilidad conjunta. Las demás posibilidades se consideran errores.
+
+Por eso, cuanto menor sea el resultado, mejor será la capacidad de identificar el mensaje original utilizando máxima posibilidad.
+
+capacidad_binaria(M, paso)
+Objetivo: calcular aproximadamente la capacidad de un canal que tiene dos símbolos de entrada, buscando la distribución a priori que maximiza la información mutua.
+
+Funcionamiento paso a paso:
+1. Recibe la matriz del canal y un valor paso, que determina de cuánto en cuánto se van a probar las probabilidades.
+2. Inicializa la capacidad en cero.
+3. Inicializa probabilidad_optima en None.
+4. Inicializa p en cero.
+5. Comienza un ciclo que prueba todos los valores de p entre cero y uno.
+6. Para cada valor construye la distribución a priori:
+\[
+P(A)=[p,1-p]
+\]
+
+7. Calcula las probabilidades de salida recorriendo las columnas de la matriz y aplicando la ley de probabilidad total.
+8. Calcula la entropía de salida \(H(B)\).
+9. Calcula la entropía del ruido \(H(B|A)\):
+   - Recorre las filas de la matriz.
+   - Calcula la entropía de cada fila.
+   - Multiplica esa entropía por la probabilidad a priori de la entrada correspondiente.
+   - Acumula los resultados.
+10. Calcula la información mutua:
+\[
+I(A;B)=H(B)-H(B|A)
+\]
+
+11. Compara el resultado con la capacidad máxima encontrada hasta ese momento.
+12. Si la información mutua es mayor:
+- Actualiza la capacidad.
+- Guarda la distribución a priori que produjo ese resultado.
+13. Incrementa p utilizando el valor de paso.
+14. Cuando termina de recorrer las posibilidades, devuelve la capacidad encontrada y la probabilidad a priori óptima.
+Concepto importante: la capacidad del canal es la máxima información mutua que se puede conseguir eligiendo adecuadamente las probabilidades de entrada.
+\[
+C=\max_{P(A)} I(A;B)
+\]
+
+Ojo: es un cálculo aproximado, porque prueba probabilidades separadas por el valor de paso. Cuanto menor sea el paso, mayor será la precisión, aunque también aumentará el tiempo de ejecución.
+
+7. Detección y corrección de errores
+verificarMatriz(matriz)
+Objetivo: detectar errores en una matriz de bits utilizando paridad par por filas y columnas.
+
+Funcionamiento paso a paso:
+1. Recibe una matriz de cadenas binarias.
+2. Crea dos listas vacías: filasError y columnasError.
+3. Primero recorre todas las filas.
+4. Cuenta cuántos unos tiene cada fila utilizando count("1").
+5. Si la cantidad de unos es impar, significa que esa fila tiene un error de paridad.
+6. Guarda el índice de esa fila en filasError.
+7. Después recorre todas las columnas.
+8. Para cada columna cuenta cuántos unos tiene recorriendo todas las filas.
+9. Si la cantidad de unos es impar, guarda el índice de esa columna en columnasError.
+10. Finalmente, devuelve las dos listas.
+Concepto importante: utiliza un sistema de paridad bidimensional. Cuando se produce un único error en un bit, la fila y la columna correspondientes quedan con paridad incorrecta.
+
+decodificarMensaje(matriz)
+Objetivo: detectar y corregir un posible error de un bit y posteriormente reconstruir el mensaje original.
+
+Funcionamiento paso a paso:
+1. Recibe la matriz de bits.
+2. Llama a verificarMatriz(matriz) para detectar las filas y columnas con errores de paridad.
+3. Comprueba si existe exactamente una fila incorrecta y exactamente una columna incorrecta.
+4. Si se cumple:
+   - Obtiene el índice de la fila y la columna.
+   - Convierte la fila correspondiente en una lista para poder modificarla.
+   - Accede al bit ubicado en la intersección de esa fila y columna.
+   - Si el bit es 0, lo cambia por 1.
+   - Si el bit es 1, lo cambia por 0.
+   - Vuelve a guardar la fila corregida como una cadena.
+5. Si existen errores de paridad, pero no hay exactamente una fila y una columna incorrectas, devuelve una cadena vacía.
+6. Si no hay errores o se pudo corregir el error, comienza a reconstruir el mensaje.
+7. Recorre las filas desde la posición 1, porque supone que la primera fila contiene información de paridad y no datos.
+8. De cada fila extrae los primeros siete bits.
+9. Convierte esos siete bits de binario a decimal.
+10. Utiliza chr() para transformar el valor decimal en su correspondiente carácter ASCII.
+11. Agrega cada carácter al mensaje.
+12. Finalmente, devuelve el mensaje reconstruido.
+Concepto importante: este método permite detectar y corregir un error de un bit mediante paridad bidimensional. La intersección entre la fila y la columna incorrectas permite localizar el bit que debe invertirse.

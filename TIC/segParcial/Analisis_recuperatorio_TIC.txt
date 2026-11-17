@@ -1,0 +1,90 @@
+ANÁLISIS Y JUSTIFICACIÓN DE RESULTADOS — RECUPERATORIO TIC
+
+EJERCICIO 1 — FUENTE Y CODIFICACIÓN
+
+1)  Entropía de la fuente Se separó el mensaje binario en las ocho
+    palabras de dos bits que forman el código dado. A partir de las
+    frecuencias de esas palabras se estimaron las probabilidades de los
+    cuatro símbolos y se calculó la entropía. El resultado,
+    aproximadamente 1,9056 bits por símbolo, está cerca del máximo de 2
+    bits para una fuente de cuatro símbolos. Esto indica que la
+    incertidumbre es elevada, aunque no máxima, porque los símbolos no
+    son equiprobables. La entropía representa el límite teórico de
+    longitud media para una codificación binaria sin pérdida.
+
+2)  Código óptimo para la extensión de orden 3 Se formaron bloques de
+    tres símbolos, con 4³ = 64 combinaciones posibles. Suponiendo una
+    fuente sin memoria, la probabilidad de cada bloque se obtiene
+    multiplicando las probabilidades de sus tres símbolos. Luego se
+    aplica Huffman para construir un código binario prefijo de longitud
+    media mínima. Las combinaciones más probables reciben, en general,
+    palabras más cortas. La ventaja de extender la fuente es que se
+    pueden aprovechar mejor las diferencias de probabilidad entre
+    bloques.
+
+3)  Rendimiento y redundancia El código original tiene longitud media de
+    2 bits por símbolo, rendimiento aproximado de 95,28 % y redundancia
+    de 4,72 %. Esto significa que aprovecha bastante bien la longitud
+    empleada, aunque conserva cierto exceso respecto de la entropía.
+    Para la extensión de orden 3, la longitud media es aproximadamente
+    5,7578 bits por bloque, el rendimiento asciende a 99,29 % y la
+    redundancia baja a 0,71 %. Por lo tanto, el código extendido es más
+    eficiente y se aproxima más al límite teórico.
+
+4)  Comparación de entropía y longitudes medias Para la fuente original
+    se cumple H(S) ≈ 1,9056 < L = 2. Si la fuente es sin memoria, la
+    entropía de la extensión es H(S³) = 3H(S) ≈ 5,7168 bits por bloque,
+    menor que L ≈ 5,7578. Ambos códigos respetan el límite de Shannon.
+    Aunque la longitud media de la extensión es mayor en términos
+    absolutos, cada palabra codifica tres símbolos: equivale a
+    aproximadamente 1,9193 bits por símbolo, frente a 2 bits del código
+    original. Así, la extensión mejora la compresión sin perder
+    información.
+
+EJERCICIO 2 — CANAL DE COMUNICACIÓN
+
+1)  Distribución óptima de entrada La distribución óptima se obtiene
+    maximizando la información mutua respecto de las probabilidades de
+    entrada, sujetas a P(0) + P(1) = 1. Para la matriz dada se obtiene
+    aproximadamente P(0) = 0,5643 y P(1) = 0,4357. Esto demuestra que la
+    distribución que mejor aprovecha un canal no necesariamente es
+    equiprobable: depende de sus probabilidades de transición. Con esa
+    distribución se alcanza la capacidad del canal.
+
+2)  Equivocación, pérdida e información mutua La equivocación H(A|B) ≈
+    0,3698 bits mide la incertidumbre que permanece sobre la entrada
+    después de conocer la salida. Es mayor que cero porque, si se recibe
+    C, no se puede saber con certeza si se envió 0 o 1. La pérdida
+    H(B|A) ≈ 0,6631 bits mide la incertidumbre sobre la salida aun
+    sabiendo qué se transmitió: cuando se envía 1 pueden producirse A, B
+    o C. La información mutua I(A;B) ≈ 0,6182 bits expresa cuánto
+    conocimiento de la entrada aporta la salida. Al emplearse la
+    distribución óptima, coincide con la capacidad del canal. Por lo
+    tanto, el canal transmite información útil, pero no permite
+    recuperar siempre la entrada sin incertidumbre.
+
+3)  Detección y corrección de errores Para analizar el mensaje recibido
+    se organiza la secuencia según el esquema de caracteres ASCII y los
+    bits de paridad vertical, longitudinal y cruzada indicado en la
+    consigna. Se verifican las paridades de filas y columnas para
+    localizar inconsistencias. Cuando hay un único error de bit, la
+    intersección de la fila y la columna incorrectas permite ubicarlo y
+    corregirlo invirtiendo ese bit. La corrección permite recuperar el
+    mensaje «ok». Este método puede corregir un error aislado, pero no
+    garantiza la corrección de todas las combinaciones de errores
+    múltiples.
+
+4)  Posibilidad de transmisión por el canal La matriz establece que, si
+    se envía 0, necesariamente se recibe C: las transiciones 0→A y 0→B
+    tienen probabilidad nula. Si se envía 1, pueden recibirse A, B o C.
+    En consecuencia, recibir A o B permite identificar con certeza que
+    la entrada fue 1, mientras que recibir C deja incertidumbre.
+    Aplicando la regla de máxima posibilidad, A y B se asocian a 1 y C
+    se asocia a 0, porque P(C|0) = 1 supera P(C|1) = 0,2. Sin embargo,
+    una decisión sobre la entrada más probable no demuestra por sí sola
+    qué se transmitió realmente. Para afirmar que un mensaje concreto no
+    pudo atravesar el canal es necesario identificar al menos una
+    transición imposible (de probabilidad cero) en la correspondencia
+    entre símbolos transmitidos y recibidos. Sin esa correspondencia
+    explícita, la matriz permite establecer las restricciones, pero no
+    demostrar la imposibilidad de ese mensaje particular.
