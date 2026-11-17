@@ -532,3 +532,47 @@ print("Columnas con error:", columnas)
 mensajeCorregido = U2.decodificarMensaje(matrizBits)
 
 print("Mensaje corregido:", mensajeCorregido)"""
+
+
+
+#funcion q con un codg y un mensaje codificado, te crea un alfabeto
+def decodificar(codigo, mensaje):
+    alfabeto = []
+
+    for i in range(len(codigo)):
+        alfabeto.append(chr(ord('A') + i))
+
+    tabla = {}
+
+    for i in range(len(codigo)):
+        tabla[codigo[i]] = alfabeto[i]
+
+    resultado = ""
+    actual = ""
+
+    for bit in mensaje:
+        actual += bit
+
+        if actual in tabla:
+            resultado += tabla[actual]
+            actual = ""
+
+    if actual != "":
+        print("Error: código incompleto")
+        return None
+
+    print("Mensaje decodificado:", resultado)
+    print("\nProbabilidades:")
+
+    probabilidades = []
+
+    for simbolo in alfabeto:
+        cantidad = resultado.count(simbolo)
+        probabilidad = cantidad / len(resultado)
+        probabilidades.append(probabilidad)
+
+        print(simbolo, ":", probabilidad)
+
+    return resultado, probabilidades
+
+
