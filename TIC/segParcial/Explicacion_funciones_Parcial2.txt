@@ -1,0 +1,185 @@
+Explicación sencilla de las funciones — Parcial 2 TIC
+
+Basado en tu archivo funcionesParcial2.py. La idea es que puedas
+explicar qué hace cada función y cómo lo hace, sin memorizar todas las
+líneas.
+
+1. Fuentes y codificación
+
+extenderNrecur(ListaC, ListaP, n) 1. Si n = 1, devuelve el alfabeto y
+sus probabilidades originales. 2. Si n es mayor, construye primero la
+extensión de orden n−1. 3. Combina cada secuencia anterior con cada
+símbolo original. 4. Multiplica sus probabilidades y devuelve las nuevas
+secuencias y probabilidades. Sirve para: estudiar bloques de n símbolos.
+Supone una fuente sin memoria.
+
+prob_priori(entrada) 1. Obtiene los símbolos diferentes y los ordena. 2.
+Cuenta cuántas veces aparece cada uno. 3. Divide cada cantidad por la
+longitud total. Devuelve: alfabeto y probabilidades de entrada.
+
+entropia(P) 1. Recorre las probabilidades. 2. Para cada probabilidad
+positiva calcula −p·log₂(p). 3. Suma los valores. Sirve para: medir la
+incertidumbre media de la fuente, en bits por símbolo.
+
+huffman(probabilidades) 1. Crea un nodo por símbolo con su probabilidad.
+2. Ordena los nodos de menor a mayor probabilidad. 3. Une los dos menos
+probables y repite hasta formar un árbol. 4. Recorre el árbol: izquierda
+= 0 y derecha = 1. Devuelve: un código binario prefijo óptimo. Los
+códigos se corresponden con el orden de las probabilidades.
+
+shannonFano(probabilidades) 1. Ordena los símbolos de mayor a menor
+probabilidad. 2. Divide el conjunto en dos grupos con sumas de
+probabilidades lo más parecidas posible. 3. Asigna 0 a un grupo y 1 al
+otro. 4. Repite la división hasta separar todos los símbolos. Devuelve:
+un código prefijo; a diferencia de Huffman, no siempre tiene longitud
+media mínima.
+
+codificarMensaje(alf, cod, mensaje) 1. Relaciona cada símbolo del
+alfabeto con su palabra de código. 2. Sustituye los símbolos del mensaje
+por sus bits. 3. Agrega ceros al final hasta completar grupos de 8 bits.
+4. Convierte cada grupo en un byte. Devuelve: un bytearray. Atención: no
+guarda cuántos bits eran reales antes del relleno.
+
+tasaCompresion(mensaje, codificacion) 1. Mide el tamaño del mensaje
+original en bytes UTF-8. 2. Mide cuántos bytes ocupa la codificación. 3.
+Divide tamaño original / tamaño codificado. Interpretación: mayor que 1
+indica compresión. Como la codificación se guarda en bytes completos, el
+relleno puede afectar el resultado.
+
+Longitud(Prob, cod) 1. Obtiene la longitud en bits de cada palabra del
+código. 2. Multiplica cada longitud por la probabilidad de su símbolo.
+3. Suma todo. Devuelve: la longitud media, en bits por símbolo (o bits
+por bloque si el alfabeto está extendido).
+
+rendimientoRedundancia(C, P) 1. Calcula la entropía con entropia(P). 2.
+Calcula la longitud media con Longitud(P,C). 3. Divide entropía /
+longitud media para obtener el rendimiento. 4. Calcula redundancia = 1 −
+rendimiento. Devuelve: los dos valores. Cuanto mayor el rendimiento y
+menor la redundancia, mejor se aprovechan los bits.
+
+shanonN(S, P, n) 1. Calcula la entropía. 2. Calcula la longitud media
+del código recibido. 3. Imprime la comparación H < L < H+1. Atención: en
+tu archivo el parámetro n no se usa. La función imprime una comparación,
+pero no verifica automáticamente el teorema para una extensión de orden
+n. Para la extensión hay que comparar unidades equivalentes y considerar
+H ≤ L/n < H+1/n.
+
+decodificar(codigo, mensaje) 1. Crea automáticamente los nombres A, B,
+C… para las palabras del código. 2. Relaciona cada palabra binaria con
+su letra. 3. Lee el mensaje bit a bit hasta encontrar una palabra válida
+y la reemplaza por su letra. 4. Cuenta las letras decodificadas para
+estimar sus probabilidades. Devuelve:
+(mensaje_decodificado, probabilidades). Orden correcto de llamada en TU
+archivo: decodificar(codigo, mensaje), con solo dos argumentos. Funciona
+como se espera para códigos prefijos.
+
+2. Canales de información
+
+matriz_canal(entrada, salida) 1. Obtiene los símbolos distintos de
+entrada y salida. 2. Para cada símbolo de entrada cuenta cuántas veces
+se transmitió. 3. Cuenta cuántas veces produjo cada salida. 4. Divide
+cada conteo por el total de esa entrada. Devuelve: la matriz de
+probabilidades de transición P(salida | entrada). Las filas corresponden
+a entradas.
+
+probabilidades_salida(P, M) 1. Recorre cada columna (cada salida
+posible). 2. Multiplica cada probabilidad de entrada por su transición a
+esa salida. 3. Suma los productos. Devuelve: las probabilidades de
+recibir cada salida, P(B).
+
+probabilidades_posteriori(P, M) 1. Calcula primero las probabilidades de
+salida. 2. Aplica Bayes a cada combinación entrada-salida. 3. Si una
+salida tiene probabilidad cero, coloca cero para evitar dividir por
+cero. Devuelve: P(entrada | salida), útil para inferir qué se transmitió
+al observar la salida.
+
+analizar_canal(M) 1. Revisa las filas: si una entrada puede dar varias
+salidas, el canal no es determinante. 2. Revisa las columnas: si una
+salida puede venir de varias entradas, el canal no es sin ruido. 3.
+Imprime si es determinante, sin ruido, ambos o ninguno. Idea:
+determinante = conozco la salida a partir de la entrada; sin ruido =
+conozco la entrada a partir de la salida.
+
+conjunta(P, M) 1. Recorre las entradas y salidas. 2. Multiplica
+P(entrada) por P(salida | entrada). Devuelve: una matriz con las
+probabilidades conjuntas P(entrada, salida).
+
+equivocacion(M, P) 1. Construye las probabilidades conjuntas. 2. Calcula
+la entropía conjunta y la de salida. 3. Las resta. Devuelve: H(A|B), la
+incertidumbre que queda sobre lo transmitido después de recibir la
+salida. Si vale cero, la salida permite identificar la entrada.
+
+informacion_mutua(M, P) 1. Calcula la entropía de entrada. 2. Calcula la
+equivocación. 3. Resta ambas. Devuelve: I(A;B), la información que
+aporta la salida sobre la entrada. En tu archivo el orden es matriz
+primero, probabilidades después.
+
+ruido(P, M) 1. Obtiene las probabilidades conjuntas. 2. Recorre las
+transiciones posibles y acumula su aporte entrópico. 3. Devuelve el
+resultado. Devuelve: H(B|A), también llamada pérdida: incertidumbre de
+la salida cuando ya se conoce la entrada. Si vale cero, el canal es
+determinante.
+
+columnasProporcionales(matriz, c1, c2) 1. Compara dos columnas de la
+matriz. 2. Comprueba si sus valores mantienen la misma proporción en
+todas las filas. 3. Devuelve True o False. Sirve para: identificar
+salidas que pueden agruparse en una reducción suficiente del canal.
+
+matrizReduccion(matriz, c1, c2) 1. Identifica las dos columnas que se
+quieren unir. 2. Construye una matriz que conserva las demás salidas y
+agrupa esas dos. Devuelve: una matriz auxiliar de reducción, no
+directamente la matriz final del canal.
+
+reducirCanal(matriz) 1. Copia la matriz original. 2. Busca pares de
+columnas proporcionales. 3. Construye la matriz auxiliar de reducción.
+4. Intenta componer el canal con esa matriz y repite hasta no encontrar
+más pares. Atención: llama a canalCompuesto(), pero esa función no
+aparece definida en el archivo subido. Así como está, puede fallar al
+intentar reducir.
+
+capacidad_binaria(M, paso) 1. Prueba distintas probabilidades de entrada
+P(0)=p y P(1)=1−p. 2. Para cada distribución calcula las probabilidades
+de salida. 3. Calcula la entropía de salida y la pérdida. 4. Obtiene la
+información mutua y se queda con el valor mayor. Devuelve:
+(capacidad, distribución_óptima). Un paso más pequeño mejora la
+precisión, pero requiere más cálculos.
+
+probabilidadError(apriori, matriz) 1. Para cada salida calcula la
+probabilidad conjunta de recibirla desde cada entrada. 2. Elige la
+entrada más probable para esa salida. 3. Suma las probabilidades de las
+otras entradas como errores. Devuelve: la probabilidad mínima de error
+de decisión usando esas probabilidades de entrada.
+
+3. Detección de errores y ASCII
+
+verificarMatriz(matriz) 1. Revisa cada fila y cuenta los unos. 2. Marca
+las filas con cantidad impar de unos. 3. Hace lo mismo con las columnas.
+Devuelve: índices de filas y columnas con error de paridad, suponiendo
+paridad par. Atención: está definida dos veces de forma idéntica en tu
+archivo; Python usa la segunda. Podés dejar una sola.
+
+decodificarMensaje(matriz) 1. Llama a verificarMatriz para localizar
+errores de paridad. 2. Si encuentra exactamente una fila y una columna
+con error, invierte el bit de su intersección. 3. Si encuentra otra
+combinación de errores detectados, devuelve un texto vacío. 4. Lee los
+primeros 7 bits de cada fila desde la segunda y los convierte de ASCII
+binario a caracteres. Devuelve: el texto decodificado. Está pensado para
+el esquema de matriz de paridad de la cátedra; no garantiza corregir
+errores múltiples.
+
+4. Qué funciones usar en cada tipo de consigna
+
+-   Fuente, entropía y código: decodificar, prob_priori, entropia,
+    huffman, Longitud, rendimientoRedundancia, extenderNrecur.
+-   Canal y probabilidades: matriz_canal, probabilidades_salida,
+    probabilidades_posteriori, analizar_canal.
+-   Información del canal: equivocacion, ruido, informacion_mutua,
+    capacidad_binaria, probabilidadError.
+-   Reducción: columnasProporcionales, matrizReduccion, reducirCanal
+    (falta canalCompuesto).
+-   Errores y ASCII: verificarMatriz, decodificarMensaje.
+
+Recordatorio importante: en tu archivo hay funciones que reciben primero
+las probabilidades y después la matriz, y otras al revés. Mirá siempre
+la definición antes de llamarlas. Por ejemplo: equivocacion(M,P),
+informacion_mutua(M,P), pero ruido(P,M).

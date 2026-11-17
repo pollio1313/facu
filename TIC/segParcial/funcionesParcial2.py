@@ -535,7 +535,7 @@ print("Mensaje corregido:", mensajeCorregido)"""
 
 
 
-#funcion q con un codg y un mensaje codificado, te crea un alfabeto
+#funcion q con un codg y un mensaje codificado, te crea un alfabeto y p
 def decodificar(codigo, mensaje):
     alfabeto = []
 
